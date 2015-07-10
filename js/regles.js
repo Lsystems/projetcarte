@@ -11,6 +11,8 @@ function tirage(sabot){
 	// on sort une carte du sabot
 	var tirage=sabot.shift();
 	var carte=new tradCarte(tirage);
+	reglesDeDepart.atout=tirage.enseigne;
+	console.log(reglesDeDepart);
 	// on l'ajoute au tapis
 	$("#defausse").append('<div data-figure="'+tirage.figure+'" data-enseigne="'+tirage.enseigne+'">'+carte.tradCardFigure+' '+carte.tradCardEnseigne+'</div>');
 

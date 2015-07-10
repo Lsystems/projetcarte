@@ -21,7 +21,7 @@ $(window).load(function(){
 			$("#playerboard").append('<div data-joueur="'+numjoueur+'" class="joueur"><div class="nomjoueur">'+value.nom+'</div><div class="main"></div></div>');
 			// constitution du tapis
 			$("#tapis").append('<div data-joueur="'+numjoueur+'" class="joueur"><div class="nomjoueur">'+value.nom+'</div><div class="carte"></div></div>');
-			
+			// affichage des mains des joueurs
 			$.each(main, function(index,value){
 				var carte=new tradCarte(value);
 				$("#playerboard .joueur[data-joueur="+numjoueur+"] .main").append('<div data-figure='+value.figure+' data-enseigne='+value.enseigne+'>'+carte.tradCardFigure+' '+carte.tradCardEnseigne+'</div>');
@@ -31,4 +31,5 @@ $(window).load(function(){
 		tirage(jeu.donne);
 		displaypioche(jeu.donne);
 		tour();
+		alert(reglesDeDepart.atout);
 });

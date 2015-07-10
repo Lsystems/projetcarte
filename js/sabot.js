@@ -3,6 +3,7 @@ var tradFigure=["valet","dame","roi","as"];
 var tradEnseigne=["Coeur","Carreau","Pique","Trèfle"];
 
 function tradCarte(card){
+	// traduction figure
 	this.tradCardFigure=function(){
 		var figure = card.figure;
 	// si on dépasse le 10, on passe sur la traduction de figure, -11 pour retrouver l'index du tableau de traduction de figure	
@@ -11,6 +12,8 @@ function tradCarte(card){
 		}
 		return figure;
 	}(card); // closure pour attendre la boucle
+	
+	// traduction enseigne
 	this.tradCardEnseigne=function(){
 		// -1 pour retrouver l'index du tableau de traduction d'enseigne
 		var enseigne = tradEnseigne[card.enseigne-1];
@@ -90,7 +93,7 @@ function distribution(){
 	this.donne=distrib.pile();
 	
 	// on créer les joueurs
-	for (var i=0;i<regles.nbJoueur;i++){
+	for (var lenombredecarteadistribuer=0;lenombredecarteadistribuer<regles.nbJoueur;i++){
 		// et on les rentre dans le tableau des joueurs
 		joueurArray.push(new player(i,"Joueur "+i));
 	}
