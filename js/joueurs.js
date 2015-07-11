@@ -1,3 +1,5 @@
+
+
 //tableau des joueurs
 var joueurArray=[];
 
@@ -11,5 +13,4 @@ function player(playerNum,playerName){
 	this.numJoueur=playerNum,
 	this.nom=playerName,
 	this.main=[]
-
 }

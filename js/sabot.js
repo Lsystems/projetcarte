@@ -19,14 +19,15 @@ function tradCarte(card){
 		var enseigne = tradEnseigne[card.enseigne-1];
 		return enseigne;
 	}(card);// closure pour attendre la boucle
-	
 
 }
 
+
+
 // objet carte
-function carte(){
-	this.figure,
-	this.enseigne
+function carte(figure,enseigne){
+	this.figure=figure,
+	this.enseigne=enseigne
 }
 
 //constitution du sabot
@@ -45,12 +46,9 @@ function sabot(){
 			
 			// si on a pas encore toute les enseignes (évite de générer une carte vide)
 			if(enseigne<this.possibleEnseigne.length){
-				// on créer un nouvelle carte
-				var tempCard=new carte();
-				// on remplit la carte avec sa figure
-				tempCard.figure=this.possibleFigure[figure];
-				// on remplit la carte avec son enseigne
-				tempCard.enseigne=this.possibleEnseigne[enseigne];
+				// on créer un nouvelle carte avec sa figure et son enseigne
+				var tempCard=new carte(this.possibleFigure[figure],this.possibleEnseigne[enseigne]);
+				// et on la pousse dans la pile
 				cardArray.push(tempCard);
 			}
 			
@@ -84,7 +82,7 @@ function shuffle(array){
 // fonction de distribution
 function distribution(){
 	// on appel les règles de départ
-	var regles=new reglesDeDepart();
+	this.regles=new reglesDeDepart();
 	
 	// on appel le sabot
 	var distrib=new sabot();
@@ -93,15 +91,15 @@ function distribution(){
 	this.donne=distrib.pile();
 	
 	// on créer les joueurs
-	for (var lenombredecarteadistribuer=0;lenombredecarteadistribuer<regles.nbJoueur;i++){
+	for (var i=0;i<this.regles.nbJoueur;i++){
 		// et on les rentre dans le tableau des joueurs
 		joueurArray.push(new player(i,"Joueur "+i));
 	}
 	
 
 	// on distribue
-	var nbCarte=regles.nbCarteJoueur*regles.nbJoueur; // nombre total de carte à donner
-	var nbjoueur=regles.nbJoueur; // nombre de joueur
+	var nbCarte=this.regles.nbCarteJoueur*this.regles.nbJoueur; // nombre total de carte à donner
+	
 	var carteToPlayer=0;// a quelle joueur on donne la carte
 	
 	// tant qu'il reste des cartes à distribuer
@@ -117,7 +115,32 @@ function distribution(){
 		nbCarte--;
 	}
 	
+	for(var i=0;i<joueurArray.length;i++){
+		tri(joueurArray[i].main);
+	}
+}// end distribution
 
-	
+// fonctions de tri des mains des joueurs
 
+function tri(main){
+	function compareEnseigne(a,b) {
+		if (a.enseigne < b.enseigne)
+			return -1;
+		if (a.enseigne > b.enseigne)
+			return 1;
+		return 0;
+	}
+	function compareFigure(a,b) {
+		if (a.enseigne==b.enseigne && a.figure < b.figure){
+			return -1;
+		}
+		else if (a.enseigne==b.enseigne && a.figure > b.figure){
+			return 1;
+		}
+		else{
+			return 0;
+		}
+	}
+	main.sort(compareEnseigne);
+	main.sort(compareFigure);
 }
