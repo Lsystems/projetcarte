@@ -1,17 +1,23 @@
 function reglesDeDepart(){
 	// nombre de joueur
-	this.nbJoueur=2,
+	this.nbJoueur=3,
 	// nombre de cartes distribuées par joueur
 	this.nbCarteJoueur=7,
 	this.distributeur=0, // joueur distributeur en début de partie
 	this.joueur=1, // joueur au tour
 	this.endTour=0, // nombre de jeu avant la fin du tour
 	this.enseigneDemande, // l'enseigne demandée lors du tour
-	this.cartejouee=[] // le tableau des cartes qui seront jouée prendant le tour
+	this.cartejouees=[] // le tableau des cartes qui seront jouée prendant le tour
 }
 
 // après la distribution et à chaque fin de tour
 function tirage(sabot){
+	var regles=new reglesDeDepart();
+	// si il y a 3 cartes, on en enlève une
+	if(regles.nbJoueur==3){
+		// alert(sabot.length);
+		var out=sabot.splice(Math.floor(Math.random() * sabot.length),1);
+	}
 	// on sort une carte du sabot
 	var tirage=sabot.shift();
 	var carte=new tradCarte(tirage);
@@ -54,7 +60,8 @@ function tour(regles,clickedCard){
 		// si la carte est réglementaire
 		if(legal==true){
 			// on rentre la carte dans le tableau des cartes jouées pour ce tour
-			regles.cartejouee.push(carte);
+			// l'index du tableau=le numéro de joueur !!!
+			regles.cartejouees[regles.joueur]=carte;
 			// on traduit la carte pour l'affichage
 			displayCard=new tradCarte(carte);
 			// on l'ajoute au tapis
@@ -67,7 +74,7 @@ function tour(regles,clickedCard){
 			
 			// on compte le tour comme joué
 			regles.endTour+=1;
-			console.log(joueurArray[regles.joueur].main);
+			
 			// si on a pas fini le tour
 			if(regles.endTour!=regles.nbJoueur){
 				// si on arrive à la fin du tableau des joueurs
@@ -83,12 +90,45 @@ function tour(regles,clickedCard){
 			}else {
 				//si le tour est terminé
 				
-				resolution();
+				resolution(regles);
 			}
 		}
 	}
 } // end tour
 
-function resolution(){
+function resolution(regles){
+	// on analyse les cartes jouées
+	for(var i=0;i<regles.cartejouees.length;i++){
+		var carte=regles.cartejouees[i];
+		// si la carte n'est pas un atout
+		if(carte.enseigne!=reglesDeDepart.atout){
+			//si la carte n'a pas la couleur demandée
+			if(carte.enseigne!=regles.enseigneDemande){
+				// on l'enlève du tapis 
+				regles.cartejouees[i]="";
+			}
+			else{
+				regles.cartejouees[i].couleurdemandee=true;
+			}	
+		}
+		else{
+			
+			regles.cartejouees[i].atout=true;
+		}
+	}
+	compare(regles.cartejouees);
+}
 
+function compare(cartejouees){
+	for(var i=0;i<regles.cartejouees.length;i++){
+		if(cartejouees[i].hasOwnProperty("atout")){
+		
+		}
+	}
+	// for(var prop in cartejouees){
+		// for(var key in cartejouees[prop]){
+			// console.log(cartejouees[prop].hasOwnProperty("atout"));
+		// }
+		
+	// }
 }
