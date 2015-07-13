@@ -108,57 +108,37 @@ function resolution(regles){
 				regles.cartejouees[i]="";
 			}
 			else{
-				regles.cartejouees[i].couleurdemandee=true;
+				// on la compare avec toutes les autres cartes jouées
+				for(var a=0;a<regles.cartejouees.length;a++){
+					// si une des cartes a la couleur demandées
+					if(regles.cartejouees[a].enseigne==regles.enseigneDemande){					
+						// si la carte actuellement comparée est plus petite qu'une de celles qui restent, alors elle perd
+						if(carte.figure<regles.cartejouees[a].figure){
+							regles.cartejouees[i]="";
+							break;
+						}
+					}				
+				}
 			}	
 		}
 		else{
-			
-			regles.cartejouees[i].atout=true;
-		}
-	}
-	compare(regles);
-}
-
-function compare(regles){
-	for(var i=0;i<regles.cartejouees.length;i++){
-		var carte=regles.cartejouees[i];
-		// si une carte est atout
-		if(carte.hasOwnProperty("atout")){
 			// on la compare avec toutes les autres cartes jouées
 			for(var a=0;a<regles.cartejouees.length;a++){
 				// si une des cartes n'est pas atout mais de la couleur demandées, alors elle perd
-				if(regles.cartejouees[a].hasOwnProperty("couleurdemandee") && regles.cartejouees[a].couleurdemandee!=reglesDeDepart.atout){
+				if(regles.cartejouees[a].enseigne==regles.enseigneDemande && regles.cartejouees[a].enseigne!=reglesDeDepart.atout){
 					regles.cartejouees[a]="";
 				}
 				// si une des cartes est atout alors on la compare
-				if(regles.cartejouees[a].hasOwnProperty("atout")){
-					// si la carte actuellement comparée est plus petite qu'une de celle qui reste, alors elle perd
+				if(regles.cartejouees[a].enseigne==reglesDeDepart.atout){
+					// si la carte actuellement comparée est plus petite qu'une de celles qui restent, alors elle perd
 					if(carte.figure<regles.cartejouees[a].figure){
 						regles.cartejouees[i]="";
 						break;
 					}
 				}
-				
 			}
 		}
-		// si une carte à la couleur demandée
-		if(carte.hasOwnProperty("couleurdemandee")){
-			console.log("regles.cartejouees["+i+"]")
-			// on la compare avec toutes les autres cartes jouées
-			for(var a=0;a<regles.cartejouees.length;a++){
-				// si une des cartes a la couleur demandées
-				if(regles.cartejouees[a].hasOwnProperty("couleurdemandee")){
-					console.log("vs"+a);
-					// si la carte actuellement comparée est plus petite qu'une de celle qui reste, alors elle perd
-					if(carte.figure<regles.cartejouees[a].figure){
-						console.log("dead card"+i);
-						regles.cartejouees[i]="";
-						break;
-					}
-				}				
-			}
-		}
-		
 	}
 	console.log(regles.cartejouees);
 }
+
