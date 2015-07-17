@@ -46,3 +46,30 @@ body {
 #tapis .joueur{
 	margin-bottom: 20px;
 }
+
+#fancybox{
+	position: absolute;
+	z-index: 100;
+	background: rgba(0,0,0,0.5);
+	top:0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+}
+
+#fancybox div:first-child{
+	background: #fff;
+	padding: 20px;
+	width: 30%;
+	margin: auto;
+	
+}
+
+#fancybox div:first-child div{
+	margin: auto;
+	width: 100px;
+	text-align:center;
+	padding: 5px;
+	background: navy;
+	color: #fff;
+}

@@ -12,5 +12,6 @@ var joueurArray=[];
 function player(playerNum,playerName){
 	this.numJoueur=playerNum,
 	this.nom=playerName,
-	this.main=[]
+	this.main=[],
+	this.pli=[]
 }

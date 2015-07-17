@@ -1,28 +1,3 @@
-// traduction string des valeurs intégrale des cartes
-var tradFigure=["valet","dame","roi","as"];
-var tradEnseigne=["Coeur","Carreau","Pique","Trèfle"];
-
-function tradCarte(card){
-	// traduction figure
-	this.tradCardFigure=function(){
-		var figure = card.figure;
-	// si on dépasse le 10, on passe sur la traduction de figure, -11 pour retrouver l'index du tableau de traduction de figure	
-		if(figure>10){
-			figure=tradFigure[card.figure-11];
-		}
-		return figure;
-	}(card); // closure pour attendre la boucle
-	
-	// traduction enseigne
-	this.tradCardEnseigne=function(){
-		// -1 pour retrouver l'index du tableau de traduction d'enseigne
-		var enseigne = tradEnseigne[card.enseigne-1];
-		return enseigne;
-	}(card);// closure pour attendre la boucle
-
-}
-
-
 
 // objet carte
 function carte(figure,enseigne){
@@ -85,44 +60,67 @@ function distribution(){
 	this.regles=new reglesDeDepart();
 	
 	// on appel le sabot
-	var distrib=new sabot();
+	var createSabot=new sabot();
 	
 	// on créer une variable contenant les 52 cartes, pour la traiter, sinon le nombre de carte reste celui de l'objet sabot
-	this.donne=distrib.pile();
-	
-	// on créer les joueurs
-	for (var i=0;i<this.regles.nbJoueur;i++){
-		// et on les rentre dans le tableau des joueurs
-		joueurArray.push(new player(i,"Joueur "+i));
-	}
-	
-
-	// on distribue
-	var nbCarte=this.regles.nbCarteJoueur*this.regles.nbJoueur; // nombre total de carte à donner
-	
-	var carteToPlayer=0;// a quelle joueur on donne la carte
-	
-	// tant qu'il reste des cartes à distribuer
-	while(nbCarte){
-		// on pousse la premiere carte de la pioche dans la main du joueur
-		joueurArray[carteToPlayer].main.push(this.donne.shift());
-		// on change de joueur
-		carteToPlayer++;
-		// si on a distribué le dernier joueur au tour, on réinitialise
-		if(carteToPlayer>=joueurArray.length){
-			carteToPlayer=0;
+	this.pioche=createSabot.pile();
+	// si il y a 3 joueurs, on enlève une carte
+	if(regles.nbJoueur==3){
+		// alert(sabot.length);
+		var out=this.pioche.splice(Math.floor(Math.random() * sabot.length),1);
+	}	
+	this.premierTour=function(){
+		// on créer les joueurs
+		for (var i=0;i<this.regles.nbJoueur;i++){
+			// et on les rentre dans le tableau des joueurs
+			joueurArray.push(new player(i,"Joueur "+i));
 		}
-		nbCarte--;
+
+		// on distribue
+		var nbCarte=this.regles.nbCarteJoueur*this.regles.nbJoueur; // nombre total de carte à donner
+		
+		var carteToPlayer=0;// a quelle joueur on donne la carte
+		
+		// tant qu'il reste des cartes à distribuer
+		while(nbCarte){
+			// on pousse la premiere carte de la pioche dans la main du joueur
+			joueurArray[carteToPlayer].main.push(this.pioche.shift());
+			// on change de joueur
+			carteToPlayer++;
+			// si on a distribué le dernier joueur au tour, on réinitialise
+			if(carteToPlayer>=joueurArray.length){
+				carteToPlayer=0;
+			}
+			nbCarte--;
+		}
+
 	}
 	
-	for(var i=0;i<joueurArray.length;i++){
-		tri(joueurArray[i].main);
+	// fonction qui donne une carte à un joueur donné.
+	this.giveCard=function(carteToPlayer){
+		joueurArray[carteToPlayer].main.push(this.pioche.shift());
+		
 	}
+	
+	this.tri=function(flag){
+	
+		if(flag=="all"){
+		
+			for(var i=0;i<joueurArray.length;i++){
+			
+				compare(joueurArray[i].main);
+			}
+		}
+		if(typeof flag=="number"){
+			compare(joueurArray[flag].main);
+		}
+	}
+	
+	
 }// end distribution
 
 // fonctions de tri des mains des joueurs
-
-function tri(main){
+function compare(main){
 	function compareEnseigne(a,b) {
 		if (a.enseigne < b.enseigne)
 			return -1;
