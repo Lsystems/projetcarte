@@ -64,18 +64,22 @@ function distribution(){
 	
 	// on créer une variable contenant les 52 cartes, pour la traiter, sinon le nombre de carte reste celui de l'objet sabot
 	this.pioche=createSabot.pile();
-	// si il y a 3 joueurs, on enlève une carte
-	if(regles.nbJoueur==3){
-		// alert(sabot.length);
-		var out=this.pioche.splice(Math.floor(Math.random() * sabot.length),1);
-	}	
+
 	this.premierTour=function(){
 		// on créer les joueurs
 		for (var i=0;i<this.regles.nbJoueur;i++){
 			// et on les rentre dans le tableau des joueurs
 			joueurArray.push(new player(i,"Joueur "+i));
 		}
+		// si il y a 3 joueurs, on enlève une carte
+		if(regles.nbJoueur==3){
+			// alert(sabot.length);
+			var out=this.pioche.splice(Math.floor(Math.random() * sabot.length),1);
+		}
+		this.pioche.splice(0,44); //DEBUG
+		reglesDeDepart.sabotLength=this.pioche.length;
 
+		
 		// on distribue
 		var nbCarte=this.regles.nbCarteJoueur*this.regles.nbJoueur; // nombre total de carte à donner
 		
@@ -85,6 +89,7 @@ function distribution(){
 		while(nbCarte){
 			// on pousse la premiere carte de la pioche dans la main du joueur
 			joueurArray[carteToPlayer].main.push(this.pioche.shift());
+			
 			// on change de joueur
 			carteToPlayer++;
 			// si on a distribué le dernier joueur au tour, on réinitialise

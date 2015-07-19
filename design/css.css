@@ -47,6 +47,12 @@ body {
 	margin-bottom: 20px;
 }
 
+#atout{
+position: absolute;
+bottom: 10px;
+left: 50%;
+}
+
 #fancybox{
 	position: absolute;
 	z-index: 100;

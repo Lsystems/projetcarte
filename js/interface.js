@@ -3,23 +3,26 @@ var tradFigure=["valet","dame","roi","as"];
 var tradEnseigne=["Coeur","Carreau","Pique","Trèfle"];
 
 function tradCarte(card){
-	// traduction figure
-	this.tradCardFigure=function(){
-		var figure = card.figure;
-	// si on dépasse le 10, on passe sur la traduction de figure, -11 pour retrouver l'index du tableau de traduction de figure	
-		if(figure>10){
-			figure=tradFigure[card.figure-11];
-		}
-		return figure;
-	}(card); // closure pour attendre la boucle
-	
-	// traduction enseigne
-	this.tradCardEnseigne=function(){
-		// -1 pour retrouver l'index du tableau de traduction d'enseigne
-		var enseigne = tradEnseigne[card.enseigne-1];
-		return enseigne;
-	}(card);// closure pour attendre la boucle
-
+	if(typeof card!="undefined"){
+		// traduction figure
+		this.tradCardFigure=function(){
+			var figure = card.figure;
+		// si on dépasse le 10, on passe sur la traduction de figure, -11 pour retrouver l'index du tableau de traduction de figure	
+			if(figure>10){
+				figure=tradFigure[card.figure-11];
+			}
+			return figure;
+		}(card); // closure pour attendre la boucle
+		
+		// traduction enseigne
+		this.tradCardEnseigne=function(){
+			// -1 pour retrouver l'index du tableau de traduction d'enseigne
+			var enseigne = tradEnseigne[card.enseigne-1];
+			return enseigne;
+		}(card);// closure pour attendre la boucle
+	}else{
+		console.log("La carte n'est pas complète",card);
+	}
 }
 
 /* affichage de l'interface */
@@ -27,6 +30,7 @@ function affichage(){
 	this.pioche=function(pioche){
 		$("#pioche").html("");
 		// pour le tableau
+		
 		$.each(pioche, function(index,value){
 
 			var carte=new tradCarte(value);
@@ -37,11 +41,12 @@ function affichage(){
 	}
 	//affichage plateau joueurs
 	this.board=function(){
+	
 		$.each(joueurArray, function(index,value){
 			var main=value.main;
 			var numjoueur=value.numJoueur;
 			// plateau joueur temporaire dev
-			$("#playerboard").append('<div data-joueur="'+numjoueur+'" class="joueur"><div class="nomjoueur">'+value.nom+'</div><div class="main emplacement"></div></div>');
+			$("#playerboard").append('<div data-joueur="'+numjoueur+'" class="joueur"><div class="nomjoueur">'+value.nom+' <span>(0)</span></div><div class="main emplacement"></div></div>');
 			// constitution du tapis
 			$("#tapis").append('<div data-joueur="'+numjoueur+'" class="joueur"><div class="nomjoueur">'+value.nom+'</div></div>');
 		});
@@ -49,17 +54,22 @@ function affichage(){
 	
 	// affichage joueur
 	this.player=function(cmd,joueur,carte){
+	
 		if(cmd=="refreshall"){
 			// boucle pour l'affichage joueur
 			$.each(joueurArray, function(index,value){
-				var main=value.main
 				var numjoueur=value.numJoueur;
+				// affiche le nombre de pli
+				$("#playerboard .joueur[data-joueur="+numjoueur+"] span").text("("+value.pli.length+")");
+				//gestion de la main
+				var main=value.main;
 				$("#playerboard .joueur[data-joueur="+numjoueur+"] .main").html("");
 				// affichage des mains des joueurs
 				$.each(main, function(index,value){
 					var carte=new tradCarte(value);
 					$("#playerboard .joueur[data-joueur="+numjoueur+"] .main").append('<div data-index="'+index+'">'+carte.tradCardFigure+' '+carte.tradCardEnseigne+'</div>');
 				});
+				
 			});
 		}
 		if(cmd=="removecard"){
@@ -71,7 +81,8 @@ function affichage(){
 		
 		if(place=="defausse"){
 			var carte=new tradCarte(tirage);
-			var carte=new tradCarte(tirage);
+			
+					
 			$("#defausse").append('<div>'+carte.tradCardFigure+' '+carte.tradCardEnseigne+'</div>');
 		}
 		if(place=="tapis"){
@@ -81,6 +92,10 @@ function affichage(){
 		if(place=="resetall")
 			$("#defausse div, #tapis .joueur .carte").remove();
 		
+		if(place=="atout"){
+			var carte=new tradCarte({figure:1,enseigne:tirage});
+			$("#atout").text(carte.tradCardEnseigne);
+		}
 	}
 	
 	this.playerSwitcher=function(joueur){
@@ -94,7 +109,8 @@ function affichage(){
 				"Vous devez choisir la couleur demandée !",
 				res+" gagne le pli",
 				"Nouveau tour !<br/>",
-				"A "+res+" de jouer"
+				"A "+res+" de jouer",
+				res[0]+" gagne la partie avec "+res[1]+" plis !"
 			];
 			$('body').prepend('<div id="fancybox"><div class="box"><div class="fancyboxmessage">'+message[idMess]+'</div><div class="fancyclose">OK</div></div></div>');
 			

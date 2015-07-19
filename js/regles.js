@@ -1,8 +1,8 @@
 function reglesDeDepart(){
 	// nombre de joueur
-	this.nbJoueur=3,
+	this.nbJoueur=4,
 	// nombre de cartes distribuées par joueur
-	this.nbCarteJoueur=7,
+	this.nbCarteJoueur=2,
 	this.distributeur=0, // joueur distributeur en début de partie
 	this.joueur=1, // joueur au tour
 	this.endTour=0 // nombre de jeu avant la fin du tour
@@ -15,32 +15,41 @@ function roundControl(){
 }
 
 // on créer un nouveau jeu
-var display=new affichage(); // on créer l'interface
-var jeu=new distribution(); // on créer un nouveau jeu
-var regles=jeu.regles; // règles globales
-jeu.premierTour(); // init premier tour
-var round=new roundControl(); //contrôle au tour
-jeu.tri("all"); 
-tirage();
-display.playerSwitcher(regles.joueur);
 
+	var display=new affichage(); // on créer l'interface
+	var jeu=new distribution(); // on créer un nouveau jeu
+	var regles=jeu.regles; // règles globales
+	jeu.premierTour(); // init premier tour
+	var round=new roundControl(); //contrôle au tour
+	jeu.tri("all"); 
+	tirage();
+	display.playerSwitcher(regles.joueur);
+	
 // après la distribution et à chaque fin de tour
 function tirage(){
 	
-	if(regles.nbJoueur<4){
+	if(regles.nbJoueur<4 && jeu.pioche.length>0){
 		var sabot=jeu.pioche;
 		// on sort une carte du sabot
 		var tirage=sabot.shift();
 		// on définit l'atout et la carte mise en jeu pour le tour (à 3 joueurs ou moins)
 		if(!reglesDeDepart.atout){
+			// definit atout pour la partie
 			reglesDeDepart.atout=tirage.enseigne;
-		}
+			//affiche atout
+			display.emplacement("atout",reglesDeDepart.atout);
+		}//affiche atout
+			display.emplacement("atout",reglesDeDepart.atout);
 		// on stock la carte mise en jeu provisoirement jusqu'a la fin du tour
 		round.carteEnJeu=tirage;
+		
 		// on l'ajoute au tapis
 		display.emplacement("defausse",tirage);
 	}else if(regles.nbJoueur==4 && !reglesDeDepart.atout){
-		reglesDeDepart.atout=sabot[Math.floor(Math.random() * sabot.length),1].enseigne;
+		reglesDeDepart.atout=joueurArray[Math.floor(Math.random() * joueurArray.length)].main[Math.floor(Math.random() * regles.nbCarteJoueur)];
+		console.log(reglesDeDepart.atout);
+		//affiche atout
+		display.emplacement("atout",reglesDeDepart.atout.enseigne);
 	}
 
 
@@ -66,7 +75,7 @@ function tour(carteIndex,playerclicker){
 			for(var i=0; i<main.length; i++){
 				// s'il a la couleur demandée
 				if(main[i].enseigne==round.enseigneDemande){
-					alert("Vous devez jouer la couleur demandée !");
+					display.fancybox("create",0);
 					legal=false;
 					break;
 				}
@@ -87,7 +96,8 @@ function tour(carteIndex,playerclicker){
 			
 			// on compte le tour comme joué
 			regles.endTour+=1;
-			
+			// on décompte du sabot
+			reglesDeDepart.sabotLength-=1;
 			// si on a pas fini le tour
 			if(regles.endTour!=regles.nbJoueur){
 				// si on arrive à la fin du tableau des joueurs
@@ -109,14 +119,18 @@ function tour(carteIndex,playerclicker){
 } // end tour
 
 function resolution(round){
+	// tableau constituant le pli qui sera remis au gagnant du tour
+	var boitapli=[];
 	// on analyse les cartes jouées
 	for(var i=0;i<round.cartejouees.length;i++){
 		var carte=round.cartejouees[i];
+		//on met la carte dans la boitapli
+		boitapli.push(carte);
 		// si la carte n'est pas un atout
 		if(carte.enseigne!=reglesDeDepart.atout){
 			//si la carte n'a pas la couleur demandée
 			if(carte.enseigne!=round.enseigneDemande){
-			
+				
 				// on l'enlève du tapis 
 				round.cartejouees[i]="";
 			}
@@ -127,6 +141,7 @@ function resolution(round){
 					if(round.cartejouees[a].enseigne==round.enseigneDemande){					
 						// si la carte actuellement comparée est plus petite qu'une de celles qui restent, alors elle perd
 						if(carte.figure<round.cartejouees[a].figure){
+						
 							round.cartejouees[i]="";
 							break;
 						}
@@ -134,17 +149,19 @@ function resolution(round){
 				}
 			}	
 		}
-		else{
+		else{//si la carte n'est pas atout
 			// on la compare avec toutes les autres cartes jouées
 			for(var a=0;a<round.cartejouees.length;a++){
 				// si une des cartes n'est pas atout mais de la couleur demandées, alors elle perd
 				if(round.cartejouees[a].enseigne==round.enseigneDemande && round.cartejouees[a].enseigne!=reglesDeDepart.atout){
+			
 					round.cartejouees[a]="";
 				}
 				// si une des cartes est atout alors on la compare
 				if(round.cartejouees[a].enseigne==reglesDeDepart.atout){
 					// si la carte actuellement comparée est plus petite qu'une de celles qui restent, alors elle perd
 					if(carte.figure<round.cartejouees[a].figure){
+					
 						round.cartejouees[i]="";
 						break;
 					}
@@ -152,11 +169,11 @@ function resolution(round){
 			}
 		}
 	}
-	// on renvoi un tableau contenant uniquement la derniere carte gagnante, son index est celui du joueur gagnant
-	finDeTour(round.cartejouees);
+	// on renvoi un tableau contenant uniquement la derniere carte gagnante, son index est celui du joueur gagnant et un autre tableau contenant toutes les cartes du pli.
+	finDeTour(round.cartejouees,boitapli);
 }
 
-function finDeTour(result){
+function finDeTour(result,boitapli){
 
 	var joueurGagnant;
 	if(regles.nbJoueur<4){
@@ -164,22 +181,53 @@ function finDeTour(result){
 		for(var i=0; i<joueurArray.length; i++){
 			if(result[i]!=""){
 				joueurGagnant=i; // on définit le joueur gagnant
-			}else{
+			}else if(result[i]=="" && jeu.pioche.length>0){
 				// sinon on donne de nouvelles cartes aux perdants
 				joueurArray[i].main.push(jeu.pioche.shift());
 			}
 		}
 		// on ajoute la carte mise en jeu à la main du gagnant
-		joueurArray[joueurGagnant].main.push(round.carteEnJeu);
-		display.player("refreshall"); // on actualise le tableau joueur
-		display.emplacement("resetall");
+		if(typeof round.carteEnJeu!="undefined"){
+			joueurArray[joueurGagnant].main.push(round.carteEnJeu);
+		}
+		joueurArray[joueurGagnant].pli.push(boitapli); // on donne le pli au gagnant
+		
+		
+	}else{
+		for(var i=0; i<joueurArray.length; i++){
+			if(result[i]!="")
+				joueurGagnant=i; // on définit le joueur gagnant
+		}
+		joueurArray[joueurGagnant].pli.push(boitapli); // on donne le pli au gagnant
 		
 	}
-	display.fancybox("create",1,joueurArray[joueurGagnant].nom);//on affiche le gagnant
+	jeu.tri("all"); // on retri les cartes
+	display.player("refreshall"); // on actualise le tableau joueur
+	display.emplacement("resetall"); // on vide les emplacements de carte jouées
+
 	regles.joueur=joueurGagnant;//le gagnant commence le prochain tour
 	display.playerSwitcher(joueurGagnant);
+	
+	//si on est arrivé à la fin de la partie
+	if(reglesDeDepart.sabotLength<=0){
+	alert();
+		// on récupère le gagnant, celui qui a le plus de pli gagne
+		var score=0,winner,nbpli;
+		for(var i=0; i<joueurArray.length; i++){
+			if(joueurArray[i].pli.length>score){
+				score=joueurArray[i].pli.length;
+				winner=i;
+			}
+		}
+		// on affiche le gagnant de la partie avec son nom et son nombre de pli
+		display.fancybox("create",4,[joueurArray[winner].nom,score]);
+	}else{
+		display.fancybox("create",1,joueurArray[joueurGagnant].nom);//on affiche le gagnant
+		// sinon on continue la partie
+		regles.endTour=0;
+		round=new roundControl();// on lance un nouveau round
+		tirage();
+	}
 	display.pioche(jeu.pioche);
-	tirage();
-	round=new roundControl();// on lance un nouveau round
 }
 
